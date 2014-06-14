@@ -1,7 +1,8 @@
 /**
  * Created by josephsutton on 6/13/14.
  */
-var fs = require('fs');
+var fs   = require('fs');
+var path = require('path');
 
 var express = require('express');
 var app     = express();
