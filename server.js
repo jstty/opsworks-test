@@ -2,35 +2,43 @@
  * Created by josephsutton on 6/13/14.
  */
 
-var opsworksConfig  = require('shared/config/opsworks.js');
-
 var express = require('express');
 var app     = express();
 var port = 80;
+var connection;
 
 // http://docs.aws.amazon.com/opsworks/latest/userguide/workingapps-connectdb.html
-if( opsworksConfig &&
-    opsworksConfig.db &&
-    opsworksConfig.db.adapter == "mysql") {
+try {
+    var opsworksConfig  = require('shared/config/opsworks.js');
 
-    opsworksConfig.db.user = opsworksConfig.db.username;
-    var mysql      = require('mysql');
-    var connection = mysql.createConnection(opsworksConfig.db);
+    if( opsworksConfig &&
+        opsworksConfig.db &&
+        opsworksConfig.db.adapter == "mysql") {
+
+        opsworksConfig.db.user = opsworksConfig.db.username;
+        var mysql      = require('mysql');
+        var connection = mysql.createConnection(opsworksConfig.db);
+    }
+} catch(err){
+    console.error("MySQL Connection Error:", err);
 }
-
 
 // Routes
 app.get('/', function(req, res) {
-    connection.connect();
-    connection.query('SELECT * from test_table', function(err, rows, fields) {
-        if (err) {
-            res.send('Error:', err);
-            return;
-        }
+    if(connection) {
+        connection.connect();
+        connection.query('SELECT CONCAT("Hello", " World") as info', function(err, rows, fields) {
+            if (err) {
+                res.send('Error:', err);
+                return;
+            }
 
-        res.send('Data:', rows);
-    });
-    connection.end();
+            res.send('MySQL Data:', rows);
+        });
+        connection.end();
+    } else {
+        res.send('Hello World');
+    }
 });
 
 app.listen(port);
