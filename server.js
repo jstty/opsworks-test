@@ -1,26 +1,44 @@
 /**
  * Created by josephsutton on 6/13/14.
  */
+var fs = require('fs');
 
 var express = require('express');
 var app     = express();
 var port = 80;
 var connection;
 
+var baseDir = '/srv/www';
+var appName = 'opsworks-test';
+var info = {};
+
+info.env = process.env;
+info.exists = false;
+if(fs.existsSync(baseDir)) {
+    info.exists = true;
+
+    info.files = fs.readdirSync(baseDir);
+}
+
 // http://docs.aws.amazon.com/opsworks/latest/userguide/workingapps-connectdb.html
 try {
-    var opsworksConfig  = require('/srv/www/opsworks-test/shared/config/opsworks.js');
+    info.loadedConfig = false;
+    var opsworksConfig  = require(baseDir+'/'+appName+'/shared/config/opsworks.js');
+    info.loadedConfig = true;
 
     if( opsworksConfig &&
-        opsworksConfig.db &&
-        opsworksConfig.db.adapter == "mysql") {
+        opsworksConfig.db) {
 
-        opsworksConfig.db.user = opsworksConfig.db.username;
-        var mysql      = require('mysql');
-        var connection = mysql.createConnection(opsworksConfig.db);
+        info.dataAdapter = opsworksConfig.db.adapter;
+        if(opsworksConfig.db.adapter == "mysql") {
+
+            opsworksConfig.db.user = opsworksConfig.db.username;
+            var mysql      = require('mysql');
+            var connection = mysql.createConnection(opsworksConfig.db);
+        }
     }
 } catch(err){
-    console.error("MySQL Connection Error:", err);
+    console.error("Error:", err);
 }
 
 // Routes
@@ -37,7 +55,7 @@ app.get('/', function(req, res) {
         });
         connection.end();
     } else {
-        res.send('Hello World');
+        res.send('Hello World:', info);
     }
 });
 
