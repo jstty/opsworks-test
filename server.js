@@ -8,7 +8,7 @@ var app     = express();
 var port = process.env.PORT || 8080;
 var connection;
 
-var baseDir = '../shared/config';
+var baseDir = '..';
 var info = {};
 
 info.env = process.env;
@@ -21,7 +21,7 @@ if(fs.existsSync(baseDir)) {
 // http://docs.aws.amazon.com/opsworks/latest/userguide/workingapps-connectdb.html
 try {
     info.loadedConfig = false;
-    var opsworksConfig  = require(baseDir+'/opsworks.js');
+    var opsworksConfig  = require(baseDir+'/shared/config/opsworks.js');
     info.loadedConfig = true;
 
     if( opsworksConfig &&
