@@ -5,25 +5,23 @@ var fs = require('fs');
 
 var express = require('express');
 var app     = express();
-var port = 80;
+var port = process.env.PORT || 8080;
 var connection;
 
-var baseDir = '/srv/www';
-var appName = 'opsworks-test';
+var baseDir = '../shared/config';
 var info = {};
 
 info.env = process.env;
 info.exists = false;
 if(fs.existsSync(baseDir)) {
     info.exists = true;
-
     info.files = fs.readdirSync(baseDir);
 }
 
 // http://docs.aws.amazon.com/opsworks/latest/userguide/workingapps-connectdb.html
 try {
     info.loadedConfig = false;
-    var opsworksConfig  = require(baseDir+'/'+appName+'/shared/config/opsworks.js');
+    var opsworksConfig  = require(baseDir+'/opsworks.js');
     info.loadedConfig = true;
 
     if( opsworksConfig &&
