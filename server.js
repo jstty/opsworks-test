@@ -9,7 +9,7 @@ var connection;
 
 // http://docs.aws.amazon.com/opsworks/latest/userguide/workingapps-connectdb.html
 try {
-    var opsworksConfig  = require('shared/config/opsworks.js');
+    var opsworksConfig  = require('/srv/www/opsworks-test/shared/config/opsworks.js');
 
     if( opsworksConfig &&
         opsworksConfig.db &&
