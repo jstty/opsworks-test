@@ -59,6 +59,8 @@ app.get('/', function(req, res) {
 
                 res.send('MySQL Data:'+ JSON.stringify(rows));
             });
+
+            connection.release();
         });
     } else {
         // else send info
