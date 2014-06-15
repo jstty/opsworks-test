@@ -7,7 +7,7 @@ var path = require('path');
 var express = require('express');
 var app     = express();
 var port = process.env.PORT || 8080;
-var connection;
+var connectionPool;
 
 var baseDir = path.join(process.cwd(), '../..', 'shared/config');
 var info = {};
@@ -34,10 +34,12 @@ try {
 
         info.dataType = opsworksConfig.db.type;
         if(opsworksConfig.db.type == "mysql") {
-
-            opsworksConfig.db.user = opsworksConfig.db.username;
             var mysql      = require('mysql');
-            var connection = mysql.createConnection(opsworksConfig.db);
+
+            // make copy of "username" because mysql setting use "user" not "username"
+            opsworksConfig.db.user = opsworksConfig.db.username;
+            // create connection pool
+            connectionPool = mysql.createPool(opsworksConfig.db);
         }
     }
 } catch(err){
@@ -46,18 +48,18 @@ try {
 
 // default route
 app.get('/', function(req, res) {
-    // if connection then try to connect to mysql
-    if(connection) {
-        connection.connect();
-        connection.query('SELECT CONCAT("Hello", " World") as info', function(err, rows, fields) {
-            if (err) {
-                res.send('Error: '+ JSON.stringify(err));
-                return;
-            }
+    // connect only if connectionPool
+    if(connectionPool) {
+        connectionPool.getConnection(function(err, connection){
+            connection.query('SELECT CONCAT("Hello", " World") as info', function(err, rows, fields) {
+                if (err) {
+                    res.send('Error: '+ JSON.stringify(err));
+                    return;
+                }
 
-            res.send('MySQL Data:'+ JSON.stringify(rows));
+                res.send('MySQL Data:'+ JSON.stringify(rows));
+            });
         });
-        connection.end();
     } else {
         // else send info
         res.send(info);
