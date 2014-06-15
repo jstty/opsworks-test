@@ -27,6 +27,7 @@ try {
     info.loadedConfig = false;
     var opsworksConfig  = require(baseDir+'/opsworks.js');
     info.loadedConfig = true;
+    info.opsworksConfig = opsworksConfig;
 
     if( opsworksConfig &&
         opsworksConfig.db) {
@@ -43,21 +44,23 @@ try {
     console.error("Error:", err);
 }
 
-// Routes
+// default route
 app.get('/', function(req, res) {
+    // if connection then try to connect to mysql
     if(connection) {
         connection.connect();
         connection.query('SELECT CONCAT("Hello", " World") as info', function(err, rows, fields) {
             if (err) {
-                res.send('Error:', err);
+                res.send('Error: '+ JSON.stringify(err));
                 return;
             }
 
-            res.send('MySQL Data:', rows);
+            res.send('MySQL Data:'+ JSON.stringify(rows));
         });
         connection.end();
     } else {
-        res.send('Hello World:', info);
+        // else send info
+        res.send(info);
     }
 });
 
