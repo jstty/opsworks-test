@@ -27,13 +27,13 @@ try {
     info.loadedConfig = false;
     var opsworksConfig  = require(baseDir+'/opsworks.js');
     info.loadedConfig = true;
-    info.opsworksConfig = opsworksConfig;
+    //info.opsworksConfig = opsworksConfig;
 
     if( opsworksConfig &&
         opsworksConfig.db) {
 
-        info.dataAdapter = opsworksConfig.db.adapter;
-        if(opsworksConfig.db.adapter == "mysql") {
+        info.dataType = opsworksConfig.db.type;
+        if(opsworksConfig.db.type == "mysql") {
 
             opsworksConfig.db.user = opsworksConfig.db.username;
             var mysql      = require('mysql');
