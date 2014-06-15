@@ -9,7 +9,7 @@ var app     = express();
 var port = process.env.PORT || 8080;
 var connection;
 
-var baseDir = path.join(process.cwd(), '..', 'shared/config');
+var baseDir = path.join(process.cwd(), '../..', 'shared/config');
 var info = {};
 
 info.cwd = process.cwd();
